@@ -3,8 +3,15 @@ import binascii
 from enum import Enum
 
 class modes (Enum):
-    FM = '08'
+    AM = '04'
     CW = '02'
+    CWR = '03'
+    DIG = '0A'
+    FM = '08'
+    FMN = '88'
+    LSB = '00'
+    PKT = '0C'
+    USB = '01'
 
 
 ser = serial.Serial(port="COM3", \
@@ -29,5 +36,5 @@ out = binascii.hexlify(ser.read(5)).decode('ascii')
 ser.close()
 
 
-print("Value is: ", out[:-2], modes(out[-2:]).name)
+print("Frequency: {} - Mode: {}".format(out[:-2], modes(out[-2:]).name))
 
