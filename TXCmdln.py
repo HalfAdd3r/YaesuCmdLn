@@ -28,7 +28,7 @@ if __name__ == '__main__':
     
     cmds = parser.add_mutually_exclusive_group(required = True) # Main Commands as group
     cmds.add_argument('-t', '--toggleVFO', action = 'store_true', help = 'Toggle VFO A/B')
-    cmds.add_argument('-r', '--read',  action = 'store_true', /
+    cmds.add_argument('-r', '--read',  action = 'store_true', \
                       help = 'Output current data only')
     
     args = parser.parse_args()
