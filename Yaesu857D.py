@@ -33,10 +33,17 @@ class radio:
     #------------------------------------------------------------------------------
     # __pullValue - Private reader helper
     #------------------------------------------------------------------------------
-    def __pullValue(self, hexVal):
+    def __pullValue(self, hexVal, hexOut=True):
         output=bytes.fromhex(hexVal)
         self.ser.write(output)
-        return binascii.hexlify(self.ser.read(5)).decode('ascii')
+
+        tmp = binascii.hexlify(self.ser.read(5)).decode('ascii')
+
+        if hexOut:
+            return tmp
+        else:
+            return "{:0>8}".format(bin(int(tmp, 16))[2:])
+            
 
     #------------------------------------------------------------------------------
     # __setValue - Private reader helper
@@ -86,7 +93,28 @@ class radio:
         out = self.__pullValue('0000000003')[-2:]
         self.ser.close()
         return modes(out).name
+
+    #------------------------------------------------------------------------------
+    # rxStatus - Requests return TX status (TK - format for data)
+    #------------------------------------------------------------------------------
+    def rxStatus(self):
+        self.__con()
+        out = self.__pullValue('00000000E7', False)
+        self.ser.close()
         
+        #return bin(int(out, 16))[2:] #- Swap to binary and remove header
+        return out
+
+    #------------------------------------------------------------------------------
+    # txStatus - Requests return TX status (TK - format for data)
+    #------------------------------------------------------------------------------
+    def txStatus(self):
+        self.__con()
+        out = self.__pullValue('00000000F7', False)
+        self.ser.close()
+        
+        #return bin(int(out, 16))[2:] #- Swap to binary and remove header
+        return out
 
     #------------------------------------------------------------------------------
     # toggleVFO - Swaps between A and B VFO
@@ -94,6 +122,14 @@ class radio:
     def toggleVFO(self):
         self.__con()
         self.__setValue('0000000081')
+        self.ser.close()
+
+    #------------------------------------------------------------------------------
+    # setFreq - Set Frequency Value
+    #------------------------------------------------------------------------------
+    def setFreq(self, freqIn):
+        self.__con()
+        self.__setValue(freqIn + '01') #'0000000081')
         self.ser.close()
 
     

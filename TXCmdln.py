@@ -10,10 +10,29 @@
 # Last Changed:  20160412
 #------------------------------------------------------------------------------
 
-import argparse, Yaesu857D, sys
+import argparse, re, sys, Yaesu857D
 # argparse - input argument handling
-# Yaesu857D - Tranciever specific conotrol line
 # sys - system functions for quit on error
+# re - Regex for clening inputs
+# Yaesu857D - Tranciever specific conotrol line
+
+
+#------------------------------------------------------------------------------
+# freqClean - formats input as number only 8 char string
+#------------------------------------------------------------------------------
+def freqClean (numIn):
+    regPurge = re.compile(r'\D+')
+    
+    # Treat data before first decimal as megahertz
+    if "." in numIn:
+        vals = numIn.partition(".")
+        val1 = regPurge.sub("", vals[0])[:3] # num and 3 char max
+        val2 = regPurge.sub("",vals[2])[:5] # num and 5 char max
+        return "{0:0>3}{1:0<5}".format(val1, val2)
+
+    # Otherwise ensure all numbers and 8 char length    
+    else:
+        return regPurge.sub("",numIn)[:8].ljust(8,"0")
 
 
 #------------------------------------------------------------------------------
@@ -27,7 +46,10 @@ if __name__ == '__main__':
 
     
     cmds = parser.add_mutually_exclusive_group(required = True) # Main Commands as group
-    cmds.add_argument('-t', '--toggleVFO', action = 'store_true', help = 'Toggle VFO A/B')
+    cmds.add_argument('-v', '--toggleVFO', action = 'store_true', help = 'Toggle VFO A/B')
+    cmds.add_argument('-tx', '--txStatus', action = 'store_true', help = 'Get TX status')
+    cmds.add_argument('-rx', '--rxStatus', action = 'store_true', help = 'Get TX status')
+    cmds.add_argument('-f', '--frequency', help="Set Frequency")
     cmds.add_argument('-r', '--read',  action = 'store_true', \
                       help = 'Output current data only')
     
@@ -44,15 +66,13 @@ if __name__ == '__main__':
     elif args.read:
         print(radioConn.freq())
         print(radioConn.mode())
+    elif args.txStatus:
+        print(radioConn.txStatus())
+    elif args.rxStatus:
+        print(radioConn.rxStatus())
+    elif args.frequency != "":
+        radioConn.setFreq(freqClean(args.frequency))
     else:
         print(radioConn.freq())
         print(radioConn.mode())
-
-##    print(bob.freq())
-##    print (bob.mode())
-##
-##    bob.toggleVFO()
-##
-##    print(bob.freq())
-##    print (bob.mode())
 
