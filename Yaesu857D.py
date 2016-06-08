@@ -133,3 +133,25 @@ class radio:
         self.ser.close()
 
     
+    #------------------------------------------------------------------------------
+    # Scanner - 
+    # RoughTest without error handling, points out need for better control
+    # Error handling for interrupt!
+    #------------------------------------------------------------------------------
+    def scanner(self):
+        #146.610-147.390    FM Repeater Outputs
+        #147.405-147.585
+
+        # set low
+        low = 14661000
+        high = 14758500
+        step = 100
+        cur = low
+        
+        while cur < high:
+            self.setFreq(str(cur))
+            val = self.rxStatus()
+
+            cur += step
+            print (cur)
+            print(val)
